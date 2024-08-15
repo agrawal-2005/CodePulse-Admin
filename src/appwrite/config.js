@@ -1,5 +1,5 @@
-import conf from "../conf/conf.js";
-import { Client, ID, Storage, Query, Databases } from "appwrite";
+import conf from '../conf/conf.js';
+import { Client, ID, Databases, Storage, Query } from "appwrite";
 
 export class Service {
     client = new Client();
@@ -8,25 +8,19 @@ export class Service {
 
     constructor() {
         this.client
-            .setEndpoint(conf.appwriteurl)
+            .setEndpoint(conf.appwriteUrl)
             .setProject(conf.appwriteProjectId);
         this.databases = new Databases(this.client);
         this.bucket = new Storage(this.client);
     }
 
-    async createPost({ title, slug, content, featuredImage, status, userID }) {
+    async createPost({ title, slug, content, featuredImage, status, userId }) {
         try {
             return await this.databases.createDocument(
                 conf.appwriteDatabaseId,
-                conf.appwriteCollectionID,
+                conf.appwriteCollectionId,
                 slug,
-                {
-                    title,
-                    content,
-                    featuredImage,
-                    status,
-                    userID
-                }
+                { title, content, featuredImage, status, userId }
             );
         } catch (error) {
             console.error("Appwrite service :: createPost :: error", error);
@@ -38,14 +32,9 @@ export class Service {
         try {
             return await this.databases.updateDocument(
                 conf.appwriteDatabaseId,
-                conf.appwriteCollectionID,
+                conf.appwriteCollectionId,
                 slug,
-                {
-                    title,
-                    content,
-                    status,
-                    featuredImage
-                }
+                { title, content, featuredImage, status }
             );
         } catch (error) {
             console.error("Appwrite service :: updatePost :: error", error);
@@ -57,7 +46,7 @@ export class Service {
         try {
             await this.databases.deleteDocument(
                 conf.appwriteDatabaseId,
-                conf.appwriteCollectionID,
+                conf.appwriteCollectionId,
                 slug
             );
             return true;
@@ -71,7 +60,7 @@ export class Service {
         try {
             return await this.databases.getDocument(
                 conf.appwriteDatabaseId,
-                conf.appwriteCollectionID,
+                conf.appwriteCollectionId,
                 slug
             );
         } catch (error) {
@@ -80,23 +69,25 @@ export class Service {
         }
     }
 
-    async getActivePosts(queries = [Query.equal("status", "active")]) {
+    async getPosts(queries = [Query.equal("status", "active")]) {
         try {
             return await this.databases.listDocuments(
                 conf.appwriteDatabaseId,
-                conf.appwriteCollectionID,
+                conf.appwriteCollectionId,
                 queries
             );
         } catch (error) {
-            console.error("Appwrite service :: getActivePosts :: error", error);
+            console.error("Appwrite service :: getPosts :: error", error);
             return false;
         }
     }
 
+    // File upload service
+
     async uploadFile(file) {
         try {
             return await this.bucket.createFile(
-                conf.appwriteBucketID,
+                conf.appwriteBucketId,
                 ID.unique(),
                 file
             );
@@ -109,7 +100,7 @@ export class Service {
     async deleteFile(fileId) {
         try {
             await this.bucket.deleteFile(
-                conf.appwriteBucketID,
+                conf.appwriteBucketId,
                 fileId
             );
             return true;
@@ -121,12 +112,11 @@ export class Service {
 
     getFilePreview(fileId) {
         return this.bucket.getFilePreview(
-            conf.appwriteBucketID,
+            conf.appwriteBucketId,
             fileId
         );
     }
 }
 
-const appwriteService = new Service();
-
-export default appwriteService;
+const service = new Service();
+export default service;

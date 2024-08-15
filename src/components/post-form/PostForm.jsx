@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Input, RTE, Select } from "../index.js";
+import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -71,8 +71,8 @@ export default function PostForm({ post }) {
     }, [watch, slugTransform, setValue]);
 
     return (
-        <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-            <div className="w-2/3 px-2">
+        <form onSubmit={handleSubmit(submit)} className="flex flex-wrap gap-6 p-4 bg-white rounded-lg shadow-md">
+            <div className="flex-1 min-w-0 md:w-2/3 px-2">
                 <Input
                     label="Title :"
                     placeholder="Title"
@@ -90,7 +90,7 @@ export default function PostForm({ post }) {
                 />
                 <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
             </div>
-            <div className="w-1/3 px-2">
+            <div className="flex-none min-w-0 md:w-1/3 px-2 flex flex-col gap-4">
                 <Input
                     label="Featured Image :"
                     type="file"
@@ -103,7 +103,7 @@ export default function PostForm({ post }) {
                         <img
                             src={appwriteService.getFilePreview(post.featuredImage)}
                             alt={post.title}
-                            className="rounded-lg"
+                            className="rounded-lg shadow-md w-full h-auto object-cover"
                         />
                     </div>
                 )}
@@ -113,7 +113,11 @@ export default function PostForm({ post }) {
                     className="mb-4"
                     {...register("status", { required: true })}
                 />
-                <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
+                <Button
+                    type="submit"
+                    bgColor={post ? "bg-green-500" : "bg-blue-500"}
+                    className="w-full py-2 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
+                >
                     {post ? "Update" : "Submit"}
                 </Button>
             </div>

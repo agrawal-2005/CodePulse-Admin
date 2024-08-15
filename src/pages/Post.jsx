@@ -16,8 +16,8 @@ export default function Post() {
 
     useEffect(() => {
         if (slug) {
-            appwriteService.getPost(slug).then((fetchedPost) => {
-                if (fetchedPost) setPost(fetchedPost);
+            appwriteService.getPost(slug).then((post) => {
+                if (post) setPost(post);
                 else navigate("/");
             });
         } else navigate("/");
@@ -33,46 +33,35 @@ export default function Post() {
     };
 
     return post ? (
-        <div className="py-8 bg-gray-100 min-h-screen">
+        <div className="py-8">
             <Container>
-                <div className="relative mb-8 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
                     <img
                         src={appwriteService.getFilePreview(post.featuredImage)}
                         alt={post.title}
-                        className="w-full h-64 object-cover"
+                        className="rounded-xl"
                     />
-                    
+
                     {isAuthor && (
-                        <div className="absolute top-4 right-4 flex space-x-3">
+                        <div className="absolute right-6 top-6">
                             <Link to={`/edit-post/${post.$id}`}>
-                                <Button 
-                                    bgColor="bg-green-600 hover:bg-green-700" 
-                                    className="text-white"
-                                >
+                                <Button bgColor="bg-green-500" className="mr-3">
                                     Edit
                                 </Button>
                             </Link>
-                            <Button 
-                                bgColor="bg-red-600 hover:bg-red-700" 
-                                onClick={deletePost} 
-                                className="text-white"
-                            >
+                            <Button bgColor="bg-red-500" onClick={deletePost}>
                                 Delete
                             </Button>
                         </div>
                     )}
                 </div>
-                <div className="w-full mb-8">
-                    <h1 className="text-4xl font-extrabold text-gray-900">{post.title}</h1>
+                <div className="w-full mb-6">
+                    <h1 className="text-2xl font-bold">{post.title}</h1>
                 </div>
-                <div className="prose lg:prose-xl mx-auto">
+                <div className="browser-css">
                     {parse(post.content)}
-                </div>
+                    </div>
             </Container>
         </div>
-    ) : (
-        <div className="py-8 flex justify-center items-center min-h-screen bg-gray-100">
-            <p className="text-gray-600 text-xl">Loading...</p>
-        </div>
-    );
+    ) : null;
 }

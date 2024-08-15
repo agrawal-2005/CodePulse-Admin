@@ -1,96 +1,88 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { login } from "../store/authSlice";
-import { Button, Input, Logo } from "./index";
-import { useDispatch } from "react-redux";
-import authService from "../appwrite/auth";
-import { useForm } from "react-hook-form";
+import React, { useState } from 'react';
+import authService from '../appwrite/auth';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../store/authSlice';
+import { Button, Input, Logo } from './index.js';
+import { useDispatch } from 'react-redux';
+import { useForm } from 'react-hook-form';
 
 function Signup() {
-  const navigate = useNavigate();
-  const [error, setError] = useState("");
-  const dispatch = useDispatch();
-  const { register, handleSubmit, formState: { errors } } = useForm();
+    const navigate = useNavigate();
+    const [error, setError] = useState("");
+    const dispatch = useDispatch();
+    const { register, handleSubmit } = useForm();
 
-  const create = async (data) => {
-    setError("");
-    try {
-      const newUser = await authService.createAccount(data);
-      if (newUser) {
-        const userData = await authService.getCurrentUser();
-        if (userData) {
-          dispatch(login(userData));
-          navigate("/");
+    const create = async (data) => {
+        setError("");
+        try {
+            const userData = await authService.createAccount(data);
+            if (userData) {
+                const user = await authService.getCurrentUser();
+                if (user) dispatch(login(user));
+                navigate("/");
+            }
+        } catch (error) {
+            setError(error.message);
         }
-      }
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+    };
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 border border-gray-300">
-        <div className="mb-6 flex flex-col items-center">
-          <Logo width="60px" height="60px" borderRadius="50%" /> {/* Rounded logo */}
-          <h2 className="text-2xl font-bold text-gray-800 mt-4">
-            Create an Account
-          </h2>
-          <p className="text-base text-gray-600 mt-2">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-blue-600 hover:underline"
-            >
-              Sign In
-            </Link>
-          </p>
-          {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className={`mx-auto w-full max-w-lg bg-white rounded-xl p-10 border border-gray-200 shadow-lg`}>
+                <div className="mb-2 flex justify-center">
+                    <span className="inline-block w-full max-w-[100px]">
+                        <Logo width="100%" />
+                    </span>
+                </div>
+                <h2 className="text-center text-2xl font-bold leading-tight">Sign up to create an account</h2>
+                <p className="mt-2 text-center text-base text-gray-600">
+                    Already have an account?&nbsp;
+                    <Link
+                        to="/login"
+                        className="font-medium text-blue-500 transition-all duration-200 hover:underline"
+                    >
+                        Sign In
+                    </Link>
+                </p>
+                {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
+
+                <form onSubmit={handleSubmit(create)}>
+                    <div className='space-y-5'>
+                        <Input
+                            label="Full Name: "
+                            placeholder="Enter your full name"
+                            {...register("name", {
+                                required: "Full name is required",
+                            })}
+                        />
+                        <Input
+                            label="Email: "
+                            placeholder="Enter your email"
+                            type="email"
+                            {...register("email", {
+                                required: "Email is required",
+                                pattern: {
+                                    value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                                    message: "Email address must be a valid address",
+                                }
+                            })}
+                        />
+                        <Input
+                            label="Password: "
+                            type="password"
+                            placeholder="Enter your password"
+                            {...register("password", {
+                                required: "Password is required",
+                            })}
+                        />
+                        <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700">
+                            Create Account
+                        </Button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <form onSubmit={handleSubmit(create)} className="space-y-6">
-          <div className="space-y-4">
-            <Input
-              label="Full Name"
-              placeholder="Enter your full name"
-              {...register("name", { required: "Full name is required" })}
-              className="border border-gray-300 rounded-md p-3 w-full"
-              error={errors.name?.message}
-            />
-            <Input
-              label="Email"
-              placeholder="Enter your email"
-              type="email"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                  message: "Email address must be valid",
-                },
-              })}
-              className="border border-gray-300 rounded-md p-3 w-full"
-              error={errors.email?.message}
-            />
-            <Input
-              label="Password"
-              placeholder="Enter your password"
-              type="password"
-              {...register("password", { required: "Password is required" })}
-              className="border border-gray-300 rounded-md p-3 w-full"
-              error={errors.password?.message}
-            />
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-          >
-            Create Account
-          </Button>
-        </form>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Signup;
